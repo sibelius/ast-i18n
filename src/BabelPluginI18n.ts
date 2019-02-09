@@ -1,5 +1,6 @@
 import { JSXText } from '@babel/types';
 import { NodePath } from '@babel/traverse';
+import { getStableString } from './stableString';
 
 let phrases: string[] = [];
 
@@ -14,7 +15,9 @@ function BabelPluginI18n() {
           phrases = [
             ...phrases,
             node.value,
-          ]
+          ];
+
+          path.node.value = `t('${getStableString(node.value)}')`
         }
       }
     }

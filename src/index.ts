@@ -15,15 +15,17 @@ export const processFiles = (files: string[]) => {
   for (const filename of files) {
     const source = fs.readFileSync(filename, 'utf8');
 
-    babel.transformSync(source, {
+    const result = babel.transformSync(source, {
       ast: false,
-      code: false,
+      code: true,
       plugins: [BabelPluginI18n],
       // TODO - add StringExtractPlugin
       // plugins: SyntaxPlugins.list.concat([[fbt, options]]),
       sourceType: 'unambiguous',
       filename,
     });
+
+    console.log('result: ', result);
 
     const newPhrases = BabelPluginI18n.getExtractedStrings();
 

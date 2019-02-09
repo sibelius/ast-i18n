@@ -30,7 +30,14 @@ const Simple = ({ t }) => (
 );
 ```
 
-## Usage
+## Usage of string extractor
 ```bash
 yarn start --src=fixtures
+```
+
+### Usage of i18n codemod
+```bash
+npm i -g jscodeshift
+
+jscodeshift -t src/src/i18nTransfomerCodemod.ts PATH_TO_FILES
 ```
