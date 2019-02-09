@@ -1,7 +1,7 @@
-import { API } from 'jscodeshift';
+import { API, FileInfo, Options } from 'jscodeshift';
 import { getStableString } from './stableString';
 
-export default function(file, api: API, options) {
+function transform(file: FileInfo, api: API, options: Options) {
   const j = api.jscodeshift; // alias the jscodeshift API
   const root = j(file.source); // parse JS code into an AST
 
@@ -21,3 +21,6 @@ export default function(file, api: API, options) {
   // print
   return root.toSource(printOptions);
 }
+
+module.exports = transform;
+module.exports.parser = 'tsx';
