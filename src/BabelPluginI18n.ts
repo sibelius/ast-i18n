@@ -1,14 +1,13 @@
-import { JSXText } from '@babel/types';
-import { NodePath } from '@babel/traverse';
+import { PluginObj } from '@babel/core';
 import { getStableString } from './stableString';
 
 let phrases: string[] = [];
 
-function BabelPluginI18n() {
+function BabelPluginI18n(): PluginObj {
   return {
     name: 'i18n',
     visitor: {
-      JSXText(path: NodePath<JSXText>) {
+      JSXText(path) {
         const { node } = path;
 
         if (node.value) {
