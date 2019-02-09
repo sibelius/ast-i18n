@@ -10,7 +10,7 @@ function BabelPluginI18n(): PluginObj {
       JSXText(path) {
         const { node } = path;
 
-        if (node.value) {
+        if (node.value && node.value.trim()) {
           phrases = [
             ...phrases,
             node.value,

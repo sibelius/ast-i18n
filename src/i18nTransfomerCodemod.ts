@@ -13,7 +13,7 @@ export default function(file, api: API, options) {
   root
     .find(j.JSXText)
     .forEach((path) => {
-      if (path.node.value) {
+      if (path.node.value && path.node.value.trim()) {
         path.node.value = `{t('${getStableString(path.node.value)}')}`
       }
     });
