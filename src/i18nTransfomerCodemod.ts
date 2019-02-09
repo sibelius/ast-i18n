@@ -14,7 +14,7 @@ export default function(file, api: API, options) {
     .find(j.JSXText)
     .forEach((path) => {
       if (path.node.value) {
-        path.node.value = `t('${getStableString(path.node.value)}')`
+        path.node.value = `{t('${getStableString(path.node.value)}')}`
       }
     });
 
