@@ -29,3 +29,8 @@ const Simple = ({ t }) => (
   <span>t('my_simple_text'</span>
 );
 ```
+
+## Usage
+```bash
+yarn start --src=fixtures
+```
