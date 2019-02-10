@@ -25,6 +25,6 @@ it('should remove diacrits', () => {
 });
 
 // TODO - figure it out how to remove this ×
-it.skip('handle weird chars', () => {
-  expect(getStableKey('×_fechar'), 'x_fechar');
+it('handle weird chars', () => {
+  expect(getStableKey('×_fechar')).toBe('_fechar');
 });

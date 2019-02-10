@@ -1,7 +1,9 @@
 import { remove } from 'diacritics';
+import slugify from 'slugify';
 
 export const getStableKey = (str: string, keyMaxLenght: number = 40) => {
-  return remove(str).toLocaleLowerCase()
+  const cleanStr = remove(str)
+    .toLocaleLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
@@ -11,6 +13,8 @@ export const getStableKey = (str: string, keyMaxLenght: number = 40) => {
     .replace(/'+/g, '')
     .replace(/[^\x00-\x7F]/g, "")
     .slice(0, keyMaxLenght);
+
+  return slugify(cleanStr);
 };
 
 export const getStableValue = (str: string) => {
