@@ -15,9 +15,11 @@ function transform(file: FileInfo, api: API, options: Options) {
   root
     .find(j.JSXText)
     .forEach(path => {
+      const key = getStableKey(path.node.value);
+
       // TODO - use j.jsxExpressionContainer
       if (path.node.value && path.node.value.trim()) {
-        path.node.value = `{t('${getStableKey(path.node.value)}')}`
+        path.node.value = `{t('${key}')}`
       }
     });
 
@@ -28,14 +30,31 @@ function transform(file: FileInfo, api: API, options: Options) {
       return path.node.value.type === 'StringLiteral';
     })
     .forEach(path => {
+      const key = getStableKey(path.node.value.value);
 
       path.node.value = j.jsxExpressionContainer(
         j.callExpression(
           j.identifier('t'),
-          [j.stringLiteral(getStableKey(path.node.value.value))],
+          [j.stringLiteral(key)],
         )
       );
     });
+
+  //<Comp name={'Awesome'} />
+  root
+    .find(j.JSXExpressionContainer)
+    .filter(path => {
+      return path.node.expression.type === 'StringLiteral'
+    })
+    .forEach(path => {
+      const key = getStableKey(path.node.expression.value);
+
+      path.node.expression = j.callExpression(
+          j.identifier('t'),
+          [j.stringLiteral(key)],
+        );
+    });
+
 
   // print
   return root.toSource(printOptions);
