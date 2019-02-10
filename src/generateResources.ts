@@ -27,8 +27,6 @@ export const generateResources = (files: string[]) => {
         ast: false,
         code: true,
         plugins: [...babelConfig.plugins, BabelPluginI18n],
-        // TODO - add StringExtractPlugin
-        // plugins: SyntaxPlugins.list.concat([[fbt, options]]),
         sourceType: 'unambiguous',
         filename,
       });
