@@ -18,6 +18,8 @@ ${formatted}
 };
 
 export const generateResources = (files: string[], keyMaxLength: number) => {
+  BabelPluginI18n.setMaxKeyLength(keyMaxLength);
+
   let phrases = [];
   for (const filename of files) {
     const source = fs.readFileSync(filename, 'utf8');
@@ -48,4 +50,6 @@ export const generateResources = (files: string[], keyMaxLength: number) => {
 
   console.log('all collected texts');
   console.log(phrases);
+
+  return i18nMap;
 };

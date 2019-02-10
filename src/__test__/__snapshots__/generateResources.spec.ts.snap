@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generateResources extra string from Classes 1`] = `
+Object {
+  "my_great_class_component": "my great class component",
+}
+`;
