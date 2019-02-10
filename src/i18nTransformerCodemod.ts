@@ -126,44 +126,44 @@ function transform(file: FileInfo, api: API, options: Options) {
       }
     });
 
-  // export default withTranslation()(Component)
-  root
-    .find(j.ExportDefaultDeclaration)
-    .filter(path => {
-      return path.node.declaration.type === 'Identifier' || path.node.declaration.type === 'CallExpression';
-    })
-    .forEach(path => {
-      if (path.node.declaration.type === 'Identifier') {
-        path.node.declaration = j.callExpression(
-          j.callExpression(
-            j.identifier('withTranslation'),
-            [],
-          ),
-          [
-            j.identifier(path.node.declaration.name),
-          ],
-        );
-        return;
-      }
-
-      if (path.node.declaration.type === 'CallExpression') {
-        if (path.node.declaration.callee.name === 'withTranslate') {
+  if (hasI18nUsage) {
+    // export default withTranslation()(Component)
+    root
+      .find(j.ExportDefaultDeclaration)
+      .filter(path => {
+        return path.node.declaration.type === 'Identifier' || path.node.declaration.type === 'CallExpression';
+      })
+      .forEach(path => {
+        if (path.node.declaration.type === 'Identifier') {
+          path.node.declaration = j.callExpression(
+            j.callExpression(
+              j.identifier('withTranslation'),
+              [],
+            ),
+            [
+              j.identifier(path.node.declaration.name),
+            ],
+          );
           return;
         }
 
-        path.node.declaration = j.callExpression(
-          j.callExpression(
-            j.identifier('withTranslation'),
-            [],
-          ),
-          [
-            path.node.declaration,
-          ],
-        );
-      }
-    });
+        if (path.node.declaration.type === 'CallExpression') {
+          if (path.node.declaration.callee.name === 'withTranslate') {
+            return;
+          }
 
-  if (hasI18nUsage) {
+          path.node.declaration = j.callExpression(
+            j.callExpression(
+              j.identifier('withTranslation'),
+              [],
+            ),
+            [
+              path.node.declaration,
+            ],
+          );
+        }
+      });
+
     addI18nImport(j, root);
   }
 
