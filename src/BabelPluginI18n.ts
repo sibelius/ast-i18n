@@ -1,6 +1,6 @@
 import { PluginObj } from '@babel/core';
 import { getStableKey, getStableValue } from './stableString';
-import { isYupRequiredCall } from './visitorChecks';
+import { hasStringLiteralArguments } from './visitorChecks';
 
 let keyMaxLength = 40;
 let phrases: string[] = [];
@@ -55,8 +55,24 @@ function BabelPluginI18n(): PluginObj {
         }
       },
       CallExpression(path) {
-        if (isYupRequiredCall(path)) {
-          addPhrase(path.node.arguments[0].value)
+        if (hasStringLiteralArguments(path)) {
+          for (const arg of path.node.arguments) {
+            if (arg.type === 'StringLiteral') {
+              addPhrase(arg.value)
+            }
+
+            if (arg.type === 'ObjectExpression') {
+              if (arg.properties.length === 0) {
+                continue;
+              }
+
+              for (const prop of arg.properties) {
+                if (prop.value.type === 'StringLiteral') {
+                  addPhrase(prop.value.value);
+                }
+              }
+            }
+          }
         }
       }
     }

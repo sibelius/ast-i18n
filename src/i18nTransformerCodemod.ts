@@ -1,6 +1,13 @@
-import { API, FileInfo, Options } from 'jscodeshift';
+import { API, FileInfo, Options, JSCodeshift } from 'jscodeshift';
 import { getStableKey } from './stableString';
-import { isYupRequiredCall } from './visitorChecks';
+import { hasStringLiteralArguments } from './visitorChecks';
+
+const tCallExpression = (j: JSCodeshift, key: string) => {
+  return j.callExpression(
+          j.identifier('t'),
+          [j.stringLiteral(key)],
+        );
+};
 
 function transform(file: FileInfo, api: API, options: Options) {
   const j = api.jscodeshift; // alias the jscodeshift API
@@ -33,10 +40,7 @@ function transform(file: FileInfo, api: API, options: Options) {
       const key = getStableKey(path.node.value.value);
 
       path.node.value = j.jsxExpressionContainer(
-        j.callExpression(
-          j.identifier('t'),
-          [j.stringLiteral(key)],
-        )
+        tCallExpression(j, key),
       );
     });
 
@@ -49,28 +53,37 @@ function transform(file: FileInfo, api: API, options: Options) {
     .forEach(path => {
       const key = getStableKey(path.node.expression.value);
 
-      path.node.expression = j.callExpression(
-          j.identifier('t'),
-          [j.stringLiteral(key)],
-        );
+      path.node.expression = tCallExpression(j, key);
     });
 
   // Yup.string().required('this field is required')
+  // showSnackbar({ message: 'ok' })
   root
     .find(j.CallExpression)
-    .filter(path => isYupRequiredCall(path))
+    .filter(path => hasStringLiteralArguments(path))
     .forEach(path => {
-      // required only accept one parameter
-      const requiredParam = path.node.arguments[0].value;
+      if (hasStringLiteralArguments(path)) {
+        path.node.arguments = path.node.arguments.map(arg => {
+          if (arg.type === 'StringLiteral') {
+            const key = getStableKey(arg.value);
 
-      const key = getStableKey(requiredParam);
+            return tCallExpression(j, key)
+          }
 
-      path.node.arguments = [
-        j.callExpression(
-          j.identifier('t'),
-          [j.stringLiteral(key)],
-        )
-      ];
+          if (arg.type === 'ObjectExpression') {
+            arg.properties = arg.properties.map(prop => {
+              if (prop.value && prop.value.type === 'StringLiteral') {
+
+                const key = getStableKey(prop.value.value);
+                prop.value = tCallExpression(j, key);
+              }
+              return prop;
+            });
+          }
+
+          return arg;
+        })
+      }
     });
 
   // print

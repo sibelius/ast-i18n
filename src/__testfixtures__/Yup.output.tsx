@@ -18,7 +18,7 @@ const UserForm = withFormik({
     const { props } = formikBag;
     const { showSnackbar } = props;
 
-    showSnackbar({ message: 'User editted successfully!'});
+    showSnackbar({ message: t('user_editted_successfully')});
   },
 })(UserInnerForm);
 
