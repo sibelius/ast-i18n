@@ -9,7 +9,6 @@ import yargs from 'yargs';
 
 import { generateResources } from './generateResources';
 
-
 const argv = yargs
   .usage(
     'Extract all string inside JSXElement'
@@ -19,7 +18,12 @@ const argv = yargs
     'src',
     'The source to collect strings'
   )
+  .default('keyMaxLength', 40)
+  .describe(
+    'src',
+    'The source to collect strings'
+  )
   .argv;
 
 const jsFiles = shell.find(argv.src).filter(path => /\.(js|ts|tsx)$/.test(path));
-generateResources(jsFiles);
+generateResources(jsFiles, argv.keyMaxLength);

@@ -11,13 +11,13 @@ const resource = (i18nResource: {[key: string]: string}) => {
 
   return `export default {
   translation: {
-  ${formatted}
+${formatted}
   }
 }
 `
 };
 
-export const generateResources = (files: string[]) => {
+export const generateResources = (files: string[], keyMaxLength: number) => {
   let phrases = [];
   for (const filename of files) {
     const source = fs.readFileSync(filename, 'utf8');
