@@ -11,7 +11,7 @@ const addPhrase = (str: string) => {
   const value = getStableValue(str);
 
   if (!key || !value) {
-    return;
+    return null;
   }
 
   i18nMap[key] = value;
@@ -31,19 +31,19 @@ function BabelPluginI18n(): PluginObj {
         const { node } = path;
 
         if (node.value && node.value.trim()) {
-          const { key } = addPhrase(node.value);
+          const values = addPhrase(node.value);
 
-          if (!key) {
+          if (!values) {
             return;
           }
 
-          path.node.value = `t('${key}')`
+          path.node.value = `t('${values.key}')`
         }
       },
       JSXAttribute(path) {
         const { node } = path;
 
-        if (node.value.type === 'StringLiteral') {
+        if (node.value && node.value.type === 'StringLiteral') {
           addPhrase(node.value.value);
         }
       },
@@ -55,6 +55,7 @@ function BabelPluginI18n(): PluginObj {
         }
       },
       CallExpression(path) {
+        return;
         if (hasStringLiteralArguments(path)) {
           for (const arg of path.node.arguments) {
             if (arg.type === 'StringLiteral') {
@@ -67,7 +68,7 @@ function BabelPluginI18n(): PluginObj {
               }
 
               for (const prop of arg.properties) {
-                if (prop.value.type === 'StringLiteral') {
+                if (prop.value && prop.value.type === 'StringLiteral') {
                   addPhrase(prop.value.value);
                 }
               }

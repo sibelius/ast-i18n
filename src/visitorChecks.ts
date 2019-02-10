@@ -17,7 +17,7 @@ export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
   if (callee.type === 'MemberExpression') {
     const { property } = path.node.callee;
 
-    if (property.type === 'Identifier' && property.name === 'required') {
+    if (property && property.type === 'Identifier' && property.name === 'required') {
       if (path.node.arguments.length === 1) {
         if (path.node.arguments[0].type === 'StringLiteral') {
           return true;
@@ -48,7 +48,7 @@ export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
       }
 
       for (const prop of arg.properties) {
-        if (prop.value.type === 'StringLiteral') {
+        if (prop.value && prop.value.type === 'StringLiteral') {
           return true;
         }
       }
