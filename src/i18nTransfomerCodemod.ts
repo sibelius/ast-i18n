@@ -1,5 +1,5 @@
 import { API, FileInfo, Options, StringLiteral } from 'jscodeshift';
-import { getStableString } from './stableString';
+import { getStableKey } from './stableString';
 import path from 'ast-types/lib/path';
 
 function transform(file: FileInfo, api: API, options: Options) {
@@ -17,7 +17,7 @@ function transform(file: FileInfo, api: API, options: Options) {
     .forEach(path => {
       // TODO - use j.jsxExpressionContainer
       if (path.node.value && path.node.value.trim()) {
-        path.node.value = `{t('${getStableString(path.node.value)}')}`
+        path.node.value = `{t('${getStableKey(path.node.value)}')}`
       }
     });
 
@@ -32,7 +32,7 @@ function transform(file: FileInfo, api: API, options: Options) {
       path.node.value = j.jsxExpressionContainer(
         j.callExpression(
           j.identifier('t'),
-          [j.stringLiteral(getStableString(path.node.value.value))],
+          [j.stringLiteral(getStableKey(path.node.value.value))],
         )
       );
     });

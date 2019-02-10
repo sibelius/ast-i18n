@@ -4,11 +4,10 @@ import BabelPluginI18n from './BabelPluginI18n';
 
 const resource = (i18nResource: {[key: string]: string}) => {
   const formatted = Object.keys(i18nResource)
-    .map(key => `'${key}': '${i18nResource[key]}'`)
+    .map(key => `'${key}': \`${i18nResource[key]}\``)
     .join(',\n');
 
-  return `
-export default {
+  return `export default {
   translation: {
     ${formatted}
   }

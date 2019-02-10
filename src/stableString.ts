@@ -1,7 +1,11 @@
-export const getStableString = (str: string) => {
+// import { remove } from 'diacritics';
+
+
+export const getStableKey = (str: string) => {
   return str.toLocaleLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, "")
-    .split(' ')
-    .join('_');
+    .trim()
+    .replace(/ +/g, '_')
+    .replace(/\s+/g, '')
 };
