@@ -9,4 +9,7 @@ describe('i18nTransformerCodemod', () => {
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'Tsx');
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'Yup');
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'CallExpression');
+
+  // TODO - fix this
+  // defineTest(__dirname, 'i18nTransformerCodemod', null, 'Hooks');
 });

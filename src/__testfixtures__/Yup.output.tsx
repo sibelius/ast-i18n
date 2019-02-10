@@ -1,6 +1,8 @@
 import { withFormik } from 'formik';
 import * as yup from 'yup';
 
+import { useTranslation, withTranslation } from 'react-i18next';
+
 const UserInnerForm = () => (
   <span>{t('user_form_here')}</span>
 );

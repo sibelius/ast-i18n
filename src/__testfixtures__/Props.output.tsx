@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useTranslation, withTranslation } from 'react-i18next';
+
 type CustomProps = {
   name: string,
 }
