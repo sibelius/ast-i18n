@@ -7,4 +7,6 @@ describe('i18nTransformerCodemod', () => {
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'Functional');
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'Props');
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'Tsx');
+
+  defineTest(__dirname, 'i18nTransformerCodemod', null, 'Yup');
 });

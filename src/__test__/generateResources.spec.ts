@@ -4,10 +4,12 @@ import { generateResources, getResourceSource } from '../generateResources';
 import fs from "fs";
 import BabelPluginI18n from '../BabelPluginI18n';
 
-const defineTest = (dirName: string, testFilePrefix: string) => {
+const defineTest = (dirName: string, testFilePrefix: string, only: boolean = false) => {
   const testName = `extra string from ${testFilePrefix}`;
 
-  it(testName, () => {
+  const myIt = only ? it.only : it;
+
+  myIt(testName, () => {
     const fixtureDir = path.join(dirName, '..', '__testfixtures__');
     const inputPath = path.join(fixtureDir, testFilePrefix + '.input.tsx');
     const expectedOutput = fs.readFileSync(
@@ -33,4 +35,5 @@ describe('generateResources', () => {
   defineTest(__dirname, 'Functional');
   defineTest(__dirname, 'Props');
   defineTest(__dirname, 'Tsx');
+  defineTest(__dirname, 'Yup');
 });

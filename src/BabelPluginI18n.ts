@@ -1,5 +1,6 @@
 import { PluginObj } from '@babel/core';
 import { getStableKey, getStableValue } from './stableString';
+import { isYupRequiredCall } from './visitorChecks';
 
 let keyMaxLength = 40;
 let phrases: string[] = [];
@@ -53,6 +54,11 @@ function BabelPluginI18n(): PluginObj {
           addPhrase(path.node.expression.value);
         }
       },
+      CallExpression(path) {
+        if (isYupRequiredCall(path)) {
+          addPhrase(path.node.arguments[0].value)
+        }
+      }
     }
   }
 }

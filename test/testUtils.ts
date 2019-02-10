@@ -69,12 +69,14 @@ exports.runTest = runTest;
  * Handles some boilerplate around defining a simple jest/Jasmine test for a
  * jscodeshift transform.
  */
-function defineTest(dirName, transformName, options, testFilePrefix) {
+function defineTest(dirName, transformName, options, testFilePrefix, only: boolean = false) {
   const testName = testFilePrefix
     ? `transforms correctly using "${testFilePrefix}" data`
     : 'transforms correctly';
   describe(transformName, () => {
-    it(testName, () => {
+    const myIt = only ? it.only : it;
+
+    myIt(testName, () => {
       runTest(dirName, transformName, options, testFilePrefix);
     });
   });
