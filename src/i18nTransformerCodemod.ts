@@ -1,6 +1,6 @@
 import { API, FileInfo, Options, JSCodeshift, Collection } from 'jscodeshift';
 import { getStableKey } from './stableString';
-import { hasStringLiteralArguments } from './visitorChecks';
+import { hasStringLiteralArguments, hasStringLiteralJSXAttribute } from './visitorChecks';
 
 const tCallExpression = (j: JSCodeshift, key: string) => {
   return j.callExpression(
@@ -60,9 +60,7 @@ function transform(file: FileInfo, api: API, options: Options) {
   //<Comp name='Awesome' />
   root
     .find(j.JSXAttribute)
-    .filter(path => {
-      return path.node.value && path.node.value.type === 'StringLiteral';
-    })
+    .filter(path => hasStringLiteralJSXAttribute(path))
     .forEach(path => {
       const key = getStableKey(path.node.value.value);
       hasI18nUsage = true;

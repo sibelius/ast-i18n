@@ -1,12 +1,12 @@
 import React from 'react';
 
 type CustomProps = {
-  name: string,
+  title: string,
 }
 const Custom = (props: CustomProps) => {
   return (
     <div>
-      <span>{props.name}</span>
+      <span>{props.title}</span>
     </div>
   )
 }
@@ -14,6 +14,6 @@ const Custom = (props: CustomProps) => {
 const Simple = () => (
   <div>
     <span>Simple text</span>
-    <Custom name='Custom name' />
+    <Custom title='Custom name' />
   </div>
 );

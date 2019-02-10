@@ -1,15 +1,47 @@
-import { CallExpression } from '@babel/types';
+import { CallExpression, JSXAttribute } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 
+const blackListJsxAttributeName = [
+  'type',
+  'id',
+  'name',
+  'children',
+  'labelKey',
+  'labelValue',
+  'className',
+];
+
+export const hasStringLiteralJSXAttribute = (path: NodePath<JSXAttribute>) => {
+  if (!path.node.value) {
+    return false;
+  }
+
+  if (path.node.value.type !== 'StringLiteral') {
+    return false;
+  }
+
+  if (blackListJsxAttributeName.indexOf(path.node.name.name) > -1) {
+    return false;
+  }
+
+  return true;
+};
+
+const blackListCallExpressionCalle = [
+  't',
+  '_interopRequireDefault',
+  'require',
+  'routeTo',
+  'format',
+  'importScripts',
+];
 export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
   const { callee } = path.node;
 
   if (callee.type === 'Identifier') {
     const { callee } = path.node;
 
-    const blackListCalle = ['t', '_interopRequireDefault', 'require'];
-
-    if (blackListCalle.indexOf(callee.name) > -1) {
+    if (blackListCallExpressionCalle.indexOf(callee.name) > -1) {
       return false;
     }
   }
