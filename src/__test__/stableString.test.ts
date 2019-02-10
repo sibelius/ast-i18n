@@ -23,3 +23,8 @@ it('should not add multiple underscores because of multiple white spaces', () =>
 it('should remove diacrits', () => {
   expect(getStableKey('Olá Brasil')).toBe('ola_brasil');
 });
+
+// TODO - figure it out how to remove this ×
+it.skip('handle weird chars', () => {
+  expect(getStableKey('×_fechar'), 'x_fechar');
+});
