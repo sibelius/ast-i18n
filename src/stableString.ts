@@ -1,6 +1,6 @@
 import { remove } from 'diacritics';
 
-export const getStableKey = (str: string, keyMaxLenght: number) => {
+export const getStableKey = (str: string, keyMaxLenght: number = 40) => {
   return remove(str).toLocaleLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, "")
