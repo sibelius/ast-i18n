@@ -1,5 +1,5 @@
 import { PluginObj } from '@babel/core';
-import { getStableString } from './stableString';
+import { getStableKey } from './stableString';
 
 let phrases: string[] = [];
 let i18nMap = {};
@@ -17,7 +17,7 @@ function BabelPluginI18n(): PluginObj {
             node.value,
           ];
 
-          const key = getStableString(node.value);
+          const key = getStableKey(node.value);
 
           i18nMap[key] = node.value;
 
