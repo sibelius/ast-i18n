@@ -7,7 +7,7 @@ export const getStableKey = (str: string, keyMaxLenght: number = 40) => {
     .trim()
     .replace(/ +/g, '_')
     .replace(/\s+/g, '')
-    .replace(/[.*+?^${}()|[\]\\\/-:,"]/g, '')
+    .replace(/[.*+?^${}()|[\]\\\/-:,!"]/g, '')
     .replace(/'+/g, '')
     .replace(/[^\x00-\x7F]/g, "")
     .slice(0, keyMaxLenght);
