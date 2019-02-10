@@ -7,14 +7,14 @@ export const getStableKey = (str: string, keyMaxLenght: number) => {
     .trim()
     .replace(/ +/g, '_')
     .replace(/\s+/g, '')
-    .replace(/[.*+?^${}()|[\]\\\/-:"]/g, '')
+    .replace(/[.*+?^${}()|[\]\\\/-:,"]/g, '')
     .replace(/'+/g, '')
     .replace(/[^\x00-\x7F]/g, "")
     .slice(0, keyMaxLenght);
 };
 
 export const getStableValue = (str: string) => {
-  return str.toLocaleLowerCase()
+  return str
     .trim()
     .replace(/\s+/g, ' ')
 };
