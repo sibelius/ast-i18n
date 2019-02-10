@@ -2,14 +2,16 @@ import fs from 'graceful-fs';
 import * as babel from '@babel/core';
 import BabelPluginI18n from './BabelPluginI18n';
 
+import babelConfig from '../babel.config.js';
+
 const resource = (i18nResource: {[key: string]: string}) => {
   const formatted = Object.keys(i18nResource)
-    .map(key => `'${key}': \`${i18nResource[key]}\``)
+    .map(key => `   '${key}': \`${i18nResource[key]}\``)
     .join(',\n');
 
   return `export default {
   translation: {
-    ${formatted}
+  ${formatted}
   }
 }
 `
@@ -20,22 +22,24 @@ export const generateResources = (files: string[]) => {
   for (const filename of files) {
     const source = fs.readFileSync(filename, 'utf8');
 
-    babel.transformSync(source, {
-      ast: false,
-      code: true,
-      plugins: [BabelPluginI18n],
-      // TODO - add StringExtractPlugin
-      // plugins: SyntaxPlugins.list.concat([[fbt, options]]),
-      sourceType: 'unambiguous',
-      filename,
-    });
+    try {
+      babel.transformSync(source, {
+        ast: false,
+        code: true,
+        plugins: [...babelConfig.plugins, BabelPluginI18n],
+        sourceType: 'unambiguous',
+        filename,
+      });
 
-    const newPhrases = BabelPluginI18n.getExtractedStrings();
+      const newPhrases = BabelPluginI18n.getExtractedStrings();
 
-    phrases = [
-      ...phrases,
-      ...newPhrases,
-    ];
+      phrases = [
+        ...phrases,
+        ...newPhrases,
+      ];
+    } catch (err) {
+      console.log('err: ', filename, err);
+    }
   }
 
   const i18nMap = BabelPluginI18n.getI18Map();
