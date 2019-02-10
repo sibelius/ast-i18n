@@ -32,12 +32,53 @@ const Simple = ({ t }) => (
 
 ## Usage of string extractor
 ```bash
-yarn start --src=fixtures
+yarn start --src=myapp/src
 ```
 
-### Usage of i18n codemod
+- It will generate a resource.jsx file, like the below:
+```jsx
+export default {
+  translation: {
+   'ok': `ok`,
+   'cancelar': `cancelar`,
+   'continuar': `continuar`,
+   'salvar': `salvar`,
+   'endereco': `endereço:`,
+   'troca_de_senha': `troca de senha`,
+   'dados_pessoais': `dados pessoais`,
+   [key]: 'value',
+  }
+}
+```
+
+### How to use resource with react-i18next?
+- rename resource.tsx to your main language, like en.ts
+- create other resource languages based on the generated one
+
+```jsx
+import en from './en';
+
+i18n.use(LanguageDetector).init({
+  resources: {
+    en,
+  },
+  fallbackLng: 'ptBR',
+  debug: false,
+
+  interpolation: {
+    escapeValue: false, // not needed for react!!
+    formatSeparator: ',',
+  },
+
+  react: {
+    wait: true,
+  },
+});
+```
+
+## Usage of i18n codemod
 ```bash
 npm i -g jscodeshift
 
-jscodeshift -t src/src/i18nTransfomerCodemod.ts PATH_TO_FILES
+jscodeshift -t src/i18nTransfomerCodemod.ts PATH_TO_FILES
 ```
