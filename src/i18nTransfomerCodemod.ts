@@ -11,6 +11,7 @@ function transform(file: FileInfo, api: API, options: Options) {
     trailingComma: true,
   };
 
+  //<span>test</span>
   root
     .find(j.JSXText)
     .forEach(path => {
@@ -20,6 +21,7 @@ function transform(file: FileInfo, api: API, options: Options) {
       }
     });
 
+  //<Comp name='Awesome' />
   root
     .find(j.JSXAttribute)
     .filter(path => {
@@ -33,7 +35,6 @@ function transform(file: FileInfo, api: API, options: Options) {
           [j.stringLiteral(getStableString(path.node.value.value))],
         )
       );
-      // path.node.value.value = `{t('${getStableString(path.node.value.value)}')}`;
     });
 
   // print
