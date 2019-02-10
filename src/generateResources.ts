@@ -33,7 +33,7 @@ export const getResourceSource = (i18nResource: {[key: string]: string}) => {
   return prettier.format(source, prettierDefaultConfig);
 };
 
-export const generateResources = (files: string[], keyMaxLength: number) => {
+export const generateResources = (files: string[], keyMaxLength: number = 40) => {
   BabelPluginI18n.setMaxKeyLength(keyMaxLength);
 
   let phrases = [];

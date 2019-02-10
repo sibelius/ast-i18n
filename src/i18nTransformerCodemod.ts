@@ -1,6 +1,6 @@
-import { API, FileInfo, Options, StringLiteral } from 'jscodeshift';
+import { API, FileInfo, Options } from 'jscodeshift';
 import { getStableKey } from './stableString';
-import path from 'ast-types/lib/path';
+import { isYupRequiredCall } from './visitorChecks';
 
 function transform(file: FileInfo, api: API, options: Options) {
   const j = api.jscodeshift; // alias the jscodeshift API
@@ -55,6 +55,23 @@ function transform(file: FileInfo, api: API, options: Options) {
         );
     });
 
+  // Yup.string().required('this field is required')
+  root
+    .find(j.CallExpression)
+    .filter(path => isYupRequiredCall(path))
+    .forEach(path => {
+      // required only accept one parameter
+      const requiredParam = path.node.arguments[0].value;
+
+      const key = getStableKey(requiredParam);
+
+      path.node.arguments = [
+        j.callExpression(
+          j.identifier('t'),
+          [j.stringLiteral(key)],
+        )
+      ];
+    });
 
   // print
   return root.toSource(printOptions);
