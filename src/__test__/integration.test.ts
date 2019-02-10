@@ -3,6 +3,8 @@ import path from 'path';
 import find from 'find';
 import fs from 'fs';
 
+// const { defineTest } = require("jscodeshift/dist/testUtils");
+
 import '../i18nTransfomerCodemod'
 
 const getFixturesTest = () => {
@@ -24,6 +26,7 @@ const getFixturesTest = () => {
           fixturesTest = [
             ...fixturesTest,
             [
+              path.basename(filename),
               filename,
               outputFileName,
             ],
@@ -42,7 +45,7 @@ describe('integration', () => {
 
   const fixturesTest = getFixturesTest();
   test.each(fixturesTest)(
-    `.integration`, (input, output) => {
+    `.integration(%s)`, (_, input, output) => {
       console.log(`${path.basename(input)} -> ${path.basename(output)} `)
 
       const cp = childProcess.spawnSync('jscodeshift', [

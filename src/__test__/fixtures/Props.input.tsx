@@ -13,7 +13,7 @@ const Custom = (props: CustomProps) => {
 
 const Simple = () => (
   <div>
-    <span>{t('simple_text')}</span>
-    <Custom name={t('custom_name')} />
+    <span>Simple text</span>
+    <Custom name='Custom name' />
   </div>
 );
