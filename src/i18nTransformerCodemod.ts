@@ -1,4 +1,4 @@
-import { API, FileInfo, Options, JSCodeshift } from 'jscodeshift';
+import { API, FileInfo, Options, JSCodeshift, Collection } from 'jscodeshift';
 import { getStableKey } from './stableString';
 import { hasStringLiteralArguments } from './visitorChecks';
 
@@ -7,6 +7,29 @@ const tCallExpression = (j: JSCodeshift, key: string) => {
           j.identifier('t'),
           [j.stringLiteral(key)],
         );
+};
+
+const addI18nImport = (j: JSCodeshift, root: Collection<any>) => {
+  // TODO - check for usage of hooks or HOC
+  const statement = `import { useTranslation, withTranslation } from 'react-i18next';`;
+
+  // check if there is a react-i18next import already
+
+  const reactI18nNextImports = root
+    .find(j.ImportDeclaration)
+    .filter(path => path.node.source.value === 'react-i18next');
+
+  if (reactI18nNextImports.length > 0) {
+    return;
+  }
+
+  const imports = root.find(j.ImportDeclaration);
+
+  if(imports.length > 0){
+     j(imports.at(imports.length-1).get()).insertAfter(statement); // after the imports
+  }else{
+     root.get().node.program.body.unshift(statement); // begining of file
+  }
 };
 
 function transform(file: FileInfo, api: API, options: Options) {
@@ -38,7 +61,7 @@ function transform(file: FileInfo, api: API, options: Options) {
   root
     .find(j.JSXAttribute)
     .filter(path => {
-      return path.node.value.type === 'StringLiteral';
+      return path.node.value && path.node.value.type === 'StringLiteral';
     })
     .forEach(path => {
       const key = getStableKey(path.node.value.value);
@@ -53,7 +76,7 @@ function transform(file: FileInfo, api: API, options: Options) {
   root
     .find(j.JSXExpressionContainer)
     .filter(path => {
-      return path.node.expression.type === 'StringLiteral'
+      return path.node.expression && path.node.expression.type === 'StringLiteral'
     })
     .forEach(path => {
       const key = getStableKey(path.node.expression.value);
@@ -95,16 +118,7 @@ function transform(file: FileInfo, api: API, options: Options) {
     });
 
   if (hasI18nUsage) {
-    // TODO - check for usage of hooks or HOC
-    const statement = `import { useTranslation, withTranslation } from 'react-i18next';`;
-
-    const imports = root.find(j.ImportDeclaration);
-
-    if(imports.length > 0){
-       j(imports.at(imports.length-1).get()).insertAfter(statement); // after the imports
-    }else{
-       root.get().node.program.body.unshift(statement); // begining of file
-    }
+    addI18nImport(j, root);
   }
 
   // print
