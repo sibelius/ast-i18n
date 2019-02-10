@@ -1,10 +1,12 @@
 import fs from 'graceful-fs';
 import * as babel from '@babel/core';
+import prettier, { Options } from 'prettier';
+
 import BabelPluginI18n from './BabelPluginI18n';
 
 import babelConfig from '../babel.config.js';
 
-const resource = (i18nResource: {[key: string]: string}) => {
+export const resource = (i18nResource: {[key: string]: string}) => {
   const formatted = Object.keys(i18nResource)
     .map(key => `   '${key}': \`${i18nResource[key]}\``)
     .join(',\n');
@@ -15,6 +17,20 @@ ${formatted}
   }
 }
 `
+};
+
+const prettierDefaultConfig: Options = {
+  singleQuote: true,
+  jsxSingleQuote: true,
+  trailingComma: 'all',
+  printWidth: 120,
+  parser: 'babel',
+};
+
+export const getResourceSource = (i18nResource: {[key: string]: string}) => {
+  const source = resource(i18nResource);
+
+  return prettier.format(source, prettierDefaultConfig);
 };
 
 export const generateResources = (files: string[], keyMaxLength: number) => {
@@ -47,9 +63,6 @@ export const generateResources = (files: string[], keyMaxLength: number) => {
   const i18nMap = BabelPluginI18n.getI18Map();
 
   fs.writeFileSync('resource.tsx', resource(i18nMap));
-
-  console.log('all collected texts');
-  console.log(phrases);
 
   return i18nMap;
 };
