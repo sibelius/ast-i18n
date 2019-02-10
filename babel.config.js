@@ -22,5 +22,6 @@ module.exports = {
     '@babel/plugin-proposal-export-namespace-from',
     '@babel/plugin-transform-async-to-generator',
     '@babel/plugin-proposal-async-generator-functions',
+    '@babel/plugin-syntax-dynamic-import',
   ],
 };

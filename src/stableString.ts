@@ -1,6 +1,4 @@
 // import { remove } from 'diacritics';
-
-
 export const getStableKey = (str: string) => {
   return str.toLocaleLowerCase()
     .normalize('NFD')
@@ -8,4 +6,10 @@ export const getStableKey = (str: string) => {
     .trim()
     .replace(/ +/g, '_')
     .replace(/\s+/g, '')
+};
+
+export const getStableValue = (str: string) => {
+  return str.toLocaleLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')
 };
