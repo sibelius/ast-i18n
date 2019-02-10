@@ -1,6 +1,6 @@
 import { PluginObj } from '@babel/core';
 import { getStableKey, getStableValue } from './stableString';
-import { hasStringLiteralArguments } from './visitorChecks';
+import { hasStringLiteralArguments, hasStringLiteralJSXAttribute } from './visitorChecks';
 
 let keyMaxLength = 40;
 let phrases: string[] = [];
@@ -43,7 +43,7 @@ function BabelPluginI18n(): PluginObj {
       JSXAttribute(path) {
         const { node } = path;
 
-        if (node.value && node.value.type === 'StringLiteral') {
+        if (hasStringLiteralJSXAttribute(path)) {
           addPhrase(node.value.value);
         }
       },
@@ -55,7 +55,6 @@ function BabelPluginI18n(): PluginObj {
         }
       },
       CallExpression(path) {
-        return;
         if (hasStringLiteralArguments(path)) {
           for (const arg of path.node.arguments) {
             if (arg.type === 'StringLiteral') {

@@ -3,12 +3,12 @@ import React from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';
 
 type CustomProps = {
-  name: string,
+  title: string,
 }
 const Custom = (props: CustomProps) => {
   return (
     <div>
-      <span>{props.name}</span>
+      <span>{props.title}</span>
     </div>
   )
 }
@@ -16,6 +16,6 @@ const Custom = (props: CustomProps) => {
 const Simple = () => (
   <div>
     <span>{t('simple_text')}</span>
-    <Custom name={t('custom_name')} />
+    <Custom title={t('custom_name')} />
   </div>
 );
