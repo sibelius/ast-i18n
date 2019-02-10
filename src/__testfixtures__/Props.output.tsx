@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useTranslation, withTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 type CustomProps = {
   title: string,
@@ -19,3 +19,5 @@ const Simple = () => (
     <Custom title={t('custom_name')} />
   </div>
 );
+
+export default withTranslation()(Simple);
