@@ -2,6 +2,7 @@ import { PluginObj } from '@babel/core';
 import { getStableString } from './stableString';
 
 let phrases: string[] = [];
+let i18nMap = {};
 
 function BabelPluginI18n(): PluginObj {
   return {
@@ -16,7 +17,11 @@ function BabelPluginI18n(): PluginObj {
             node.value,
           ];
 
-          path.node.value = `t('${getStableString(node.value)}')`
+          const key = getStableString(node.value);
+
+          i18nMap[key] = node.value;
+
+          path.node.value = `t('${key}')`
         }
       }
     }
@@ -24,5 +29,6 @@ function BabelPluginI18n(): PluginObj {
 }
 
 BabelPluginI18n.getExtractedStrings = () => phrases;
+BabelPluginI18n.getI18Map = () => i18nMap;
 
 export default BabelPluginI18n;

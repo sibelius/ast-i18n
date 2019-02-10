@@ -5,39 +5,10 @@ generate a stable key for each string
 generate i18n files based on this
  */
 import shell from 'shelljs';
-import * as babel from '@babel/core';
-import fs  from 'graceful-fs';
 import yargs from 'yargs';
-import BabelPluginI18n from './BabelPluginI18n';
 
-export const processFiles = (files: string[]) => {
-  let phrases = [];
-  for (const filename of files) {
-    const source = fs.readFileSync(filename, 'utf8');
+import { generateResources } from './generateResources';
 
-    const result = babel.transformSync(source, {
-      ast: false,
-      code: true,
-      plugins: [BabelPluginI18n],
-      // TODO - add StringExtractPlugin
-      // plugins: SyntaxPlugins.list.concat([[fbt, options]]),
-      sourceType: 'unambiguous',
-      filename,
-    });
-
-    console.log('result: ', result);
-
-    const newPhrases = BabelPluginI18n.getExtractedStrings();
-
-    phrases = [
-      ...phrases,
-      ...newPhrases,
-    ];
-  }
-
-  console.log('all collected texts');
-  console.log(phrases);
-};
 
 const argv = yargs
   .usage(
@@ -51,4 +22,4 @@ const argv = yargs
   .argv;
 
 const jsFiles = shell.find(argv.src).filter(path => /\.(js|ts|tsx)$/.test(path));
-processFiles(jsFiles);
+generateResources(jsFiles);
