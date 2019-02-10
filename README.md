@@ -26,7 +26,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next'
 
 const Simple = ({ t }) => (
-  <span>t('my_simple_text'</span>
+  <span>{t('my_simple_text')}</span>
 );
 ```
 
