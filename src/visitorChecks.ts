@@ -7,6 +7,7 @@ const blackListJsxAttributeName = [
   'name',
   'children',
   'labelKey',
+  'valueKey',
   'labelValue',
   'className',
 ];
