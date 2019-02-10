@@ -130,18 +130,37 @@ function transform(file: FileInfo, api: API, options: Options) {
   root
     .find(j.ExportDefaultDeclaration)
     .filter(path => {
-      return path.node.declaration.type === 'Identifier' && path.node.declaration.name
+      return path.node.declaration.type === 'Identifier' || path.node.declaration.type === 'CallExpression';
     })
     .forEach(path => {
-      path.node.declaration = j.callExpression(
-        j.callExpression(
-          j.identifier('withTranslation'),
-          [],
-        ),
-        [
-          j.identifier(path.node.declaration.name),
-        ],
-      );
+      if (path.node.declaration.type === 'Identifier') {
+        path.node.declaration = j.callExpression(
+          j.callExpression(
+            j.identifier('withTranslation'),
+            [],
+          ),
+          [
+            j.identifier(path.node.declaration.name),
+          ],
+        );
+        return;
+      }
+
+      if (path.node.declaration.type === 'CallExpression') {
+        if (path.node.declaration.callee.name === 'withTranslate') {
+          return;
+        }
+
+        path.node.declaration = j.callExpression(
+          j.callExpression(
+            j.identifier('withTranslation'),
+            [],
+          ),
+          [
+            path.node.declaration,
+          ],
+        );
+      }
     });
 
   if (hasI18nUsage) {
