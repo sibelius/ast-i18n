@@ -17,3 +17,5 @@ const Simple = () => (
     <Custom title='Custom name' />
   </div>
 );
+
+export default Simple;

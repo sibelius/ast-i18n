@@ -9,12 +9,23 @@ const tCallExpression = (j: JSCodeshift, key: string) => {
         );
 };
 
+const getImportStatement = (useHoc: boolean = true, useHooks: boolean = false) => {
+  if (useHoc && !useHooks) {
+    return `import { withTranslation } from 'react-i18next';`;
+  }
+
+  if (useHooks && !useHoc) {
+    return `import { useTranslation } from 'react-i18next';`;
+  }
+
+  return `import { useTranslation, withTranslation } from 'react-i18next';`;
+};
+
 const addI18nImport = (j: JSCodeshift, root: Collection<any>) => {
-  // TODO - check for usage of hooks or HOC
-  const statement = `import { useTranslation, withTranslation } from 'react-i18next';`;
+  // TODO - handle hoc or hooks based on file
+  const statement = getImportStatement();
 
   // check if there is a react-i18next import already
-
   const reactI18nNextImports = root
     .find(j.ImportDeclaration)
     .filter(path => path.node.source.value === 'react-i18next');
@@ -113,6 +124,24 @@ function transform(file: FileInfo, api: API, options: Options) {
           return arg;
         })
       }
+    });
+
+  // export default withTranslation()(Component)
+  root
+    .find(j.ExportDefaultDeclaration)
+    .filter(path => {
+      return path.node.declaration.type === 'Identifier' && path.node.declaration.name
+    })
+    .forEach(path => {
+      path.node.declaration = j.callExpression(
+        j.callExpression(
+          j.identifier('withTranslation'),
+          [],
+        ),
+        [
+          j.identifier(path.node.declaration.name),
+        ],
+      );
     });
 
   if (hasI18nUsage) {
