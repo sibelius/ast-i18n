@@ -64,11 +64,11 @@ function transform(file: FileInfo, api: API, options: Options) {
     .find(j.JSXText)
     .forEach(path => {
       const key = getStableKey(path.node.value);
-      hasI18nUsage = true;
 
       // TODO - use j.jsxExpressionContainer
       if (path.node.value && path.node.value.trim()) {
-        path.node.value = `{t('${key}')}`
+        path.node.value = `{t('${key}')}`;
+        hasI18nUsage = true;
       }
     });
 
