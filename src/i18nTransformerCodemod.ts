@@ -45,7 +45,9 @@ const addI18nImport = (j: JSCodeshift, root: Collection<any>) => {
 
 function transform(file: FileInfo, api: API, options: Options) {
   const j = api.jscodeshift; // alias the jscodeshift API
-
+  if (file.path.endsWith('.spec.js') || file.path.endsWith('.test.js')) {
+    return;
+  }
   const root = j(file.source); // parse JS code into an AST
 
   const printOptions = options.printOptions || {
