@@ -167,10 +167,9 @@ function transform(file: FileInfo, api: API, options: Options) {
       });
 
     addI18nImport(j, root);
+    // print
+    return root.toSource(printOptions);
   }
-
-  // print
-  return root.toSource(printOptions);
 }
 
 module.exports = transform;
