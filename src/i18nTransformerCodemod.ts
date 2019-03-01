@@ -50,7 +50,9 @@ function transform(file: FileInfo, api: API, options: Options) {
 
   const printOptions = options.printOptions || {
     quote: 'single',
-    trailingComma: true,
+    trailingComma: false,
+    // TODO make this configurable
+    lineTerminator: '\n'
   };
 
   let hasI18nUsage = false;
