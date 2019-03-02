@@ -107,7 +107,7 @@ function transform(file: FileInfo, api: API, options: Options) {
     .forEach(path => {
       if (hasStringLiteralArguments(path)) {
         path.node.arguments = path.node.arguments.map(arg => {
-          if (arg.type === 'StringLiteral') {
+          if (arg.type === 'StringLiteral' && arg.value) {
             const key = getStableKey(arg.value);
             hasI18nUsage = true;
 
