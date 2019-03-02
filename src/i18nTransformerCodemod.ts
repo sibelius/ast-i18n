@@ -2,8 +2,8 @@ import { API, FileInfo, Options, JSCodeshift, Collection } from 'jscodeshift';
 import { getStableKey } from './stableString';
 import { hasStringLiteralArguments, hasStringLiteralJSXAttribute } from './visitorChecks';
 import { CallExpression, ImportDeclaration, JSXAttribute, JSXText } from "@babel/types";
-import { NodePath } from "@babel/traverse";
 import { JSXExpressionContainer } from "ast-types/gen/nodes";
+import { NodePath } from "ast-types";
 
 const tCallExpression = (j: JSCodeshift, key: string) => {
   return j.callExpression(
@@ -153,8 +153,9 @@ function translateFunctionArguments(j: JSCodeshift, root: Collection<any>) {
   let hasI18nUsage = false;
   root
     .find(j.CallExpression)
+    .filter((path: NodePath<CallExpression, CallExpression>) => !['classNames'].includes(path.value.callee.name))
     .filter((path: NodePath<CallExpression>) => hasStringLiteralArguments(path))
-    .forEach((path: NodePath<CallExpression>) => {
+    .forEach((path: NodePath<CallExpression, CallExpression>) => {
       if (hasStringLiteralArguments(path)) {
         path.node.arguments = path.node.arguments.map(arg => {
           if (arg.type === 'StringLiteral' && arg.value) {
