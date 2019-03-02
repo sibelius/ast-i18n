@@ -1,10 +1,10 @@
 import React from 'react';
-import { useTranslation, withTranslation } from 'react-i18next';
 
-const Simple = () => {
+import { useTranslation } from 'react-i18next';
+
+const SiteHeader = () => {
   const { t } = useTranslation();
-
-  return <span>{t('my_simple_text')}</span>
+  return <span>{t('my_simple_text')}</span>;
 };
 
-export default Simple;
+export default SiteHeader;

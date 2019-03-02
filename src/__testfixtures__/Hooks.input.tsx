@@ -1,7 +1,7 @@
 import React from 'react';
 
-const Simple = () => (
+const SiteHeader = () => (
   <span>My simple text</span>
 );
 
-export default Simple;
+export default SiteHeader;

@@ -1,6 +1,7 @@
 import { API, FileInfo, Options, JSCodeshift, Collection } from 'jscodeshift';
 import { getStableKey } from './stableString';
 import { hasStringLiteralArguments, hasStringLiteralJSXAttribute } from './visitorChecks';
+import { identifier } from "@babel/types";
 
 const tCallExpression = (j: JSCodeshift, key: string) => {
   return j.callExpression(
@@ -21,9 +22,9 @@ const getImportStatement = (useHoc: boolean = true, useHooks: boolean = false) =
   return `import { useTranslation, withTranslation } from 'react-i18next';`;
 };
 
-const addI18nImport = (j: JSCodeshift, root: Collection<any>) => {
+const addI18nImport = (j: JSCodeshift, root: Collection<any>, {useHooks, useHoc}) => {
   // TODO - handle hoc or hooks based on file
-  const statement = getImportStatement();
+  const statement = getImportStatement(useHoc, useHooks);
 
   // check if there is a react-i18next import already
   const reactI18nNextImports = root
@@ -132,6 +133,8 @@ function transform(file: FileInfo, api: API, options: Options) {
 
   if (hasI18nUsage) {
     // export default withTranslation()(Component)
+    let hooksUsed = false;
+    let hocUsed = false;
     root
       .find(j.ExportDefaultDeclaration)
       .filter(path => {
@@ -139,15 +142,26 @@ function transform(file: FileInfo, api: API, options: Options) {
       })
       .forEach(path => {
         if (path.node.declaration.type === 'Identifier') {
-          path.node.declaration = j.callExpression(
-            j.callExpression(
-              j.identifier('withTranslation'),
-              [],
-            ),
-            [
-              j.identifier(path.node.declaration.name),
-            ],
+          const exportedName = path.node.declaration.name;
+          const functions = findFunctionByIdentifier(j, exportedName, root);
+          let hookFound = addUseHookToFunctionBody(
+            j, functions
           );
+
+          if(!hookFound) {
+            hocUsed = true;
+            path.node.declaration = j.callExpression(
+              j.callExpression(
+                j.identifier('withTranslation'),
+                [],
+              ),
+              [
+                j.identifier(path.node.declaration.name),
+              ],
+            );
+          } else {
+            hooksUsed = true;
+          }
           return;
         }
 
@@ -156,23 +170,66 @@ function transform(file: FileInfo, api: API, options: Options) {
             return;
           }
 
-          path.node.declaration = j.callExpression(
-            j.callExpression(
-              j.identifier('withTranslation'),
-              [],
-            ),
-            [
-              path.node.declaration,
-            ],
-          );
+          console.log(path.node.declaration.arguments[0].name);
+
+          path.node.declaration.arguments.forEach(identifier => {
+            const functions = findFunctionByIdentifier(j, identifier.name, root);
+            hooksUsed = hooksUsed || addUseHookToFunctionBody(j, functions);
+          });
+
+          if (!hooksUsed) {
+            hooksUsed = true;
+            path.node.declaration = j.callExpression(
+              j.callExpression(
+                j.identifier('withTranslation'),
+                [],
+              ),
+              [
+                path.node.declaration,
+              ],
+            );
+          }
         }
       });
 
-    addI18nImport(j, root);
+    addI18nImport(j, root, {useHooks: hooksUsed, useHoc: hocUsed});
     // print
     return root.toSource(printOptions);
   }
 }
+
+function useTranslateHook(j: JSCodeshift) {
+  return j.variableDeclaration('const',
+    [j.variableDeclarator(
+      j.identifier('{ t }'),
+      j.identifier('useTranslation()')
+    )]
+  );
+}
+
+function findFunctionByIdentifier(j: JSCodeshift, identifier: string, root: Collection<any>) {
+  return root.find(j.Function)
+    .filter(p => {
+      if (j.FunctionDeclaration.check(p.node)) {
+        return p.node.id.name === identifier;
+      }
+      return p.parent.value.id && p.parent.value.id.name === identifier;
+    });
+}
+
+function addUseHookToFunctionBody(j: JSCodeshift, functions: Collection<any>) {
+  let hookFound = false;
+    functions
+    .every(n => {
+      hookFound = true;
+      const body = n.node.body;
+      n.node.body =  j.BlockStatement.check(body)
+        ? j.blockStatement([useTranslateHook(j), ...body.body])
+        : j.blockStatement([useTranslateHook(j), j.returnStatement(body)])
+    });
+  return hookFound;
+}
+
 
 module.exports = transform;
 module.exports.parser = 'tsx';
