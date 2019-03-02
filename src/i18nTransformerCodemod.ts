@@ -170,8 +170,6 @@ function transform(file: FileInfo, api: API, options: Options) {
             return;
           }
 
-          console.log(path.node.declaration.arguments[0].name);
-
           path.node.declaration.arguments.forEach(identifier => {
             const functions = findFunctionByIdentifier(j, identifier.name, root);
             hooksUsed = hooksUsed || addUseHookToFunctionBody(j, functions);
