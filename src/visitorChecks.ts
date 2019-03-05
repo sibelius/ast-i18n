@@ -1,5 +1,6 @@
 import { CallExpression, JSXAttribute } from '@babel/types';
-import { NodePath } from '@babel/traverse';
+import { NodePath } from "ast-types";
+import { JSXElement, JSXIdentifier } from "ast-types/gen/nodes";
 
 const blackListJsxAttributeName = [
   'type',
@@ -91,4 +92,9 @@ export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
   }
 
   return  false;
+};
+
+export const isSvgElement = (path: NodePath<JSXElement>) => {
+  const jsxIdentifier = path.node.openingElement.name = path.node.openingElement.name as JSXIdentifier;
+  return ["svg", 'path', 'g'].includes(jsxIdentifier.name);
 };
