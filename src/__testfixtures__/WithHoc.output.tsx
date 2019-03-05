@@ -1,10 +1,11 @@
 import React from 'react';
 import { withSnackbar } from 'snackbar';
 
-import { withTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
-const Simple = () => (
-  <span>{t('my_simple_text')}</span>
-);
+function Simple() {
+  const { t } = useTranslation();
+  return <span>{t('my_simple_text')}</span>;
+}
 
-export default withTranslation()(withSnackbar(Simple));
+export default withSnackbar(Simple);

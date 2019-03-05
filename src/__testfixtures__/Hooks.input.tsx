@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const Simple = () => (
-  <span>My simple text</span>
-);
+const SiteHeader = () => {
+  const [text] = useState('');
+  return (
+    <span>My simple text</span>
+  );
+};
 
-export default Simple;
+export default SiteHeader;

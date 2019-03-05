@@ -11,11 +11,11 @@ const Custom = (props: CustomProps) => {
   )
 }
 
-const Simple = () => (
+const Component123 = () => (
   <div>
     <span>Simple text</span>
     <Custom title='Custom name' />
   </div>
 );
 
-export default Simple;
+export default Component123;

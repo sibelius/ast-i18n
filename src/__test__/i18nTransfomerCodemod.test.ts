@@ -11,7 +11,7 @@ describe('i18nTransformerCodemod', () => {
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'CallExpression');
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'Imported');
   defineTest(__dirname, 'i18nTransformerCodemod', null, 'WithHoc');
-
-  // TODO - fix this
-  // defineTest(__dirname, 'i18nTransformerCodemod', null, 'Hooks');
+  defineTest(__dirname, 'i18nTransformerCodemod', null, 'NoChange');
+  defineTest(__dirname, 'i18nTransformerCodemod', null, 'Hooks');
+  defineTest(__dirname, 'i18nTransformerCodemod', null, 'Classnames');
 });
