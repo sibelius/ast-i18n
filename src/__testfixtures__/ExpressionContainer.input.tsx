@@ -1,7 +1,9 @@
-import React from 'react';
+import React from "react";
 
 const Simple = () => (
-  <span>{'My simple text'}</span>
+  <div>
+    <span>{"My simple text"}</span>
+  </div>
 );
 
 export default Simple;

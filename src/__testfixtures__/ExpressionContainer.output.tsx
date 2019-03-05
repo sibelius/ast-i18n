@@ -1,10 +1,15 @@
-import React from 'react';
+import React from "react";
 
 import { useTranslation } from 'react-i18next';
 
 const Simple = () => {
   const { t } = useTranslation();
-  return <span>{t('my_simple_text')}</span>;
+
+  return (
+    <div>
+      <span>{t('my_simple_text')}</span>
+    </div>
+  );
 };
 
 export default Simple;
