@@ -231,6 +231,9 @@ function translateJsxProps(j: JSCodeshift, root: Collection<any>) {
       return path.node.expression && path.node.expression.type === 'StringLiteral'
     })
     .forEach(path => {
+      if (!path.node.value || !path.node.value.value) {
+        return;
+      }
       const key = getStableKey(path.node.expression.value);
       hasI18nUsage = true;
 
