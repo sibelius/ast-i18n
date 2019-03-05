@@ -1,8 +1,8 @@
 import { API, FileInfo, Options, JSCodeshift, Collection } from 'jscodeshift';
 import { getStableKey } from './stableString';
-import { hasStringLiteralArguments, hasStringLiteralJSXAttribute } from './visitorChecks';
+import { hasStringLiteralArguments, hasStringLiteralJSXAttribute, isSvgElement } from "./visitorChecks";
 import { CallExpression, ImportDeclaration, JSXAttribute, JSXText } from "@babel/types";
-import { JSXExpressionContainer } from "ast-types/gen/nodes";
+import { JSXElement, JSXExpressionContainer } from "ast-types/gen/nodes";
 import { NodePath } from "ast-types";
 
 const tCallExpression = (j: JSCodeshift, key: string) => {
@@ -190,14 +190,11 @@ function translateJsxContent(j: JSCodeshift, root: Collection<any>) {
   let hasI18nUsage = false;
   root
     .find(j.JSXText)
-    .forEach((path: NodePath<JSXText>) => {
+    .filter((path: NodePath<JSXText>) => path.node.value && path.node.value.trim())
+    .replaceWith((path: NodePath<JSXText>) => {
+      hasI18nUsage = true;
       const key = getStableKey(path.node.value);
-
-      // TODO - use j.jsxExpressionContainer
-      if (path.node.value && path.node.value.trim()) {
-        path.node.value = `{t('${key}')}`;
-        hasI18nUsage = true;
-      }
+      return j.jsxExpressionContainer(j.callExpression(j.identifier('t'), [j.literal(key)]))
     });
   return hasI18nUsage;
 }
@@ -206,9 +203,14 @@ function translateJsxProps(j: JSCodeshift, root: Collection<any>) {
   let hasI18nUsage = false;
   //<Comp name='Awesome' />
   root
+    .find(j.JSXElement)
+    .filter((path: NodePath<JSXElement>) => !isSvgElement(path))
     .find(j.JSXAttribute)
     .filter((path: NodePath<JSXAttribute>) => hasStringLiteralJSXAttribute(path))
     .forEach((path: NodePath<JSXAttribute>) => {
+      if (!path.node.value || !path.node.value.value) {
+        return;
+      }
       const key = getStableKey(path.node.value.value);
       hasI18nUsage = true;
 
