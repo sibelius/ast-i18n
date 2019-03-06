@@ -73,11 +73,16 @@ function transform(file: FileInfo, api: API, options: Options) {
     root
       .find(j.ExportDefaultDeclaration)
       .filter(path => {
-        return path.node.declaration.type === 'Identifier' || path.node.declaration.type === 'CallExpression';
+        let exportDeclaration = path.node.declaration;
+        return j.Identifier.check(exportDeclaration)
+          || j.CallExpression.check(exportDeclaration)
+          || j.FunctionDeclaration.check(exportDeclaration);
       })
       .forEach(path => {
-        if (path.node.declaration.type === 'Identifier') {
-          const exportedName = path.node.declaration.name;
+        let exportDeclaration = path.node.declaration;
+
+        if (j.Identifier.check(exportDeclaration)) {
+          const exportedName = exportDeclaration.name;
           const functions = findFunctionByIdentifier(j, exportedName, root);
           let hookFound = addUseHookToFunctionBody(
             j, functions
@@ -85,27 +90,29 @@ function transform(file: FileInfo, api: API, options: Options) {
 
           if(!hookFound) {
             hocUsed = true;
-            path.node.declaration = withTranslationHoc(j, j.identifier(path.node.declaration.name));
+            path.node.declaration = withTranslationHoc(j, j.identifier(exportDeclaration.name));
           } else {
             hooksUsed = true;
           }
           return;
         }
-
-        if (path.node.declaration.type === 'CallExpression') {
-          if (path.node.declaration.callee.name === 'withTranslate') {
+        else if (j.CallExpression.check(exportDeclaration)) {
+          if (exportDeclaration.callee.name === 'withTranslate') {
             return;
           }
 
-          path.node.declaration.arguments.forEach(identifier => {
+          exportDeclaration.arguments.forEach(identifier => {
             const functions = findFunctionByIdentifier(j, identifier.name, root);
             hooksUsed = addUseHookToFunctionBody(j, functions) || hooksUsed;
           });
 
           if (!hooksUsed) {
             hooksUsed = true;
-            path.node.declaration = withTranslationHoc(j, path.node.declaration);
+            path.node.declaration = withTranslationHoc(j, exportDeclaration);
           }
+        } else if (j.FunctionDeclaration.check(exportDeclaration)) {
+          hooksUsed = true;
+          exportDeclaration.body = j.blockStatement([createUseTranslationCall(j), ...exportDeclaration.body.body])
         }
       });
 
@@ -115,11 +122,11 @@ function transform(file: FileInfo, api: API, options: Options) {
   }
 }
 
-function useTranslateHook(j: JSCodeshift) {
+function createUseTranslationCall(j: JSCodeshift) {
   return j.variableDeclaration('const',
     [j.variableDeclarator(
       j.identifier('{ t }'),
-      j.identifier('useTranslation()')
+      j.callExpression(j.identifier('useTranslation'), [])
     )]
   );
 }
@@ -141,8 +148,8 @@ function addUseHookToFunctionBody(j: JSCodeshift, functions: Collection<any>) {
       hookFound = true;
       const body = n.node.body;
       n.node.body =  j.BlockStatement.check(body)
-        ? j.blockStatement([useTranslateHook(j), ...body.body])
-        : j.blockStatement([useTranslateHook(j), j.returnStatement(body)])
+        ? j.blockStatement([createUseTranslationCall(j), ...body.body])
+        : j.blockStatement([createUseTranslationCall(j), j.returnStatement(body)])
     });
   return hookFound;
 }
