@@ -2,7 +2,10 @@ import { API, FileInfo, Options, JSCodeshift, Collection } from 'jscodeshift';
 import { getStableKey } from './stableString';
 import { hasStringLiteralArguments, hasStringLiteralJSXAttribute, isSvgElement } from "./visitorChecks";
 import { CallExpression, ImportDeclaration, JSXAttribute, JSXText } from "@babel/types";
-import { JSXElement, JSXExpressionContainer } from "ast-types/gen/nodes";
+import {
+  JSXElement,
+  JSXExpressionContainer
+} from "ast-types/gen/nodes";
 import { NodePath } from "ast-types";
 
 const tCallExpression = (j: JSCodeshift, key: string) => {
@@ -91,6 +94,20 @@ function transform(file: FileInfo, api: API, options: Options) {
           if(!hookFound) {
             hocUsed = true;
             path.node.declaration = withTranslationHoc(j, j.identifier(exportDeclaration.name));
+            const classDeclaration = root.find(j.ClassDeclaration, (n) => n.id.name === exportDeclaration.name)
+              .nodes()[0];
+            if (classDeclaration) {
+               const renderMethod = classDeclaration.body.body.find(
+                 n => j.ClassMethod.check(n) && n.key.name === 'render'
+               );
+               if (renderMethod) {
+                 renderMethod.body = j.blockStatement([
+                   createTranslationDefinition(j),
+                   ...renderMethod.body.body
+                 ])
+               }
+            }
+
           } else {
             hooksUsed = true;
           }
@@ -127,6 +144,15 @@ function createUseTranslationCall(j: JSCodeshift) {
     [j.variableDeclarator(
       j.identifier('{ t }'),
       j.callExpression(j.identifier('useTranslation'), [])
+    )]
+  );
+}
+
+function createTranslationDefinition(j: JSCodeshift) {
+  return j.variableDeclaration('const',
+    [j.variableDeclarator(
+      j.identifier('{ t }'),
+      j.memberExpression(j.thisExpression(), j.identifier('props'))
     )]
   );
 }
