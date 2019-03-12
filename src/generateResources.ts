@@ -64,5 +64,8 @@ export const generateResources = (files: string[], keyMaxLength: number = 40) =>
 
   fs.writeFileSync('resource.tsx', resource(i18nMap));
 
+  // tslint:disable-next-line
+  console.log('generate resource file: resource.tsx');
+
   return i18nMap;
 };

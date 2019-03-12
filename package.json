@@ -1,9 +1,10 @@
 {
   "name": "ast-i18n",
   "version": "1.0.0",
-  "main": "index.js",
   "author": "Sibelius Seraphini <sibeliusseraphini@gmai.com> (https://github.com/sibelius)",
-  "license": "MIT",
+  "bin": {
+    "ast-i18n": "./bin/cli"
+  },
   "dependencies": {
     "@types/prettier": "^1.16.0",
     "ast-types": "^0.12.2",
@@ -50,10 +51,15 @@
     "jest": "^24.1.0",
     "jscodeshift": "^0.6.3"
   },
+  "license": "MIT",
+  "main": "index.js",
   "scripts": {
     "b": "babel-node --extensions \".es6,.js,.es,.jsx,.mjs,.ts,.tsx\"",
-    "start": "yarn b src/index.ts",
+    "build": "rm -rf lib/* && babel src --extensions \".es6,.js,.es,.jsx,.mjs,.ts,.tsx\" --ignore __test__,__testfixtures__,*.spec.ts --out-dir lib",
     "fixtures": "yarn start --src=fixtures",
-    "test": "jest"
+    "prepublish": "npm run build",
+    "start": "yarn b src/index.ts",
+    "test": "jest",
+    "watch": "babel --extensions \".es6,.js,.es,.jsx,.mjs,.ts,.tsx\" -w -d ./lib ./src"
   }
 }
