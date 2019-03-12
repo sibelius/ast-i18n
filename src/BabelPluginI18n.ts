@@ -1,6 +1,10 @@
 import { PluginObj } from '@babel/core';
 import { getStableKey, getStableValue } from './stableString';
-import { hasStringLiteralArguments, hasStringLiteralJSXAttribute } from './visitorChecks';
+import {
+  hasStringLiteralArguments,
+  hasStringLiteralJSXAttribute,
+  isSvgElementAttribute
+} from "./visitorChecks";
 
 let keyMaxLength = 40;
 let phrases: string[] = [];
@@ -43,7 +47,7 @@ function BabelPluginI18n(): PluginObj {
       JSXAttribute(path) {
         const { node } = path;
 
-        if (hasStringLiteralJSXAttribute(path)) {
+        if (hasStringLiteralJSXAttribute(path) && !isSvgElementAttribute(path)) {
           addPhrase(node.value.value);
         }
       },
