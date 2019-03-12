@@ -24,6 +24,7 @@ npm-debug.log
 dump.rdb
 bundle.js
 
+lib
 build
 dist
 coverage
