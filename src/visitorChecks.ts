@@ -13,6 +13,8 @@ const blackListJsxAttributeName = [
   'className',
 ];
 
+let svgElementNames = ["svg", 'path', 'g'];
+
 export const hasStringLiteralJSXAttribute = (path: NodePath<JSXAttribute>) => {
   if (!path.node.value) {
     return false;
@@ -96,5 +98,12 @@ export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
 
 export const isSvgElement = (path: NodePath<JSXElement>) => {
   const jsxIdentifier = path.node.openingElement.name = path.node.openingElement.name as JSXIdentifier;
-  return ["svg", 'path', 'g'].includes(jsxIdentifier.name);
+  return svgElementNames.includes(jsxIdentifier.name);
+};
+
+export const isSvgElementAttribute = (path: NodePath<JSXAttribute>) => {
+  if (!path.parent || !path.parent.name) {
+    return false;
+  }
+  return svgElementNames.includes(path.parent.name.name);
 };

@@ -37,4 +37,5 @@ describe('generateResources', () => {
   defineTest(__dirname, 'Tsx');
   defineTest(__dirname, 'Yup');
   defineTest(__dirname, 'CallExpression');
+  defineTest(__dirname, 'Svg');
 });
