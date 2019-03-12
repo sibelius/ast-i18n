@@ -82,3 +82,38 @@ npm i -g jscodeshift
 
 jscodeshift -t src/i18nTransfomerCodemod.ts PATH_TO_FILES
 ```
+
+## How to customize blacklist
+Use ast.config.js to customize blacklist for jsx attribute name and call expression calle
+
+```jsx
+module.exports = {
+  blackListJsxAttributeName: [
+    'type',
+    'id',
+    'name',
+    'children',
+    'labelKey',
+    'valueKey',
+    'labelValue',
+    'className',
+    'color',
+    'key',
+    'size',
+    'charSet',
+    'content',
+  ],
+  blackListCallExpressionCalle: [
+    't',
+    '_interopRequireDefault',
+    'require',
+    'routeTo',
+    'format',
+    'importScripts',
+    'buildPath',
+    'createLoadable',
+    'import',
+    'setFieldValue',
+  ],
+};
+```

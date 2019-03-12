@@ -1,19 +1,9 @@
 import { CallExpression, JSXAttribute } from '@babel/types';
 import { NodePath } from "ast-types";
 import { JSXElement, JSXIdentifier } from "ast-types/gen/nodes";
+import { getAstConfig } from './config';
 
-const blackListJsxAttributeName = [
-  'type',
-  'id',
-  'name',
-  'children',
-  'labelKey',
-  'valueKey',
-  'labelValue',
-  'className',
-];
-
-let svgElementNames = ["svg", 'path', 'g'];
+const svgElementNames = ["svg", 'path', 'g'];
 
 export const hasStringLiteralJSXAttribute = (path: NodePath<JSXAttribute>) => {
   if (!path.node.value) {
@@ -24,6 +14,8 @@ export const hasStringLiteralJSXAttribute = (path: NodePath<JSXAttribute>) => {
     return false;
   }
 
+  const { blackListJsxAttributeName } = getAstConfig();
+
   if (blackListJsxAttributeName.indexOf(path.node.name.name) > -1) {
     return false;
   }
@@ -31,16 +23,10 @@ export const hasStringLiteralJSXAttribute = (path: NodePath<JSXAttribute>) => {
   return true;
 };
 
-const blackListCallExpressionCalle = [
-  't',
-  '_interopRequireDefault',
-  'require',
-  'routeTo',
-  'format',
-  'importScripts',
-];
 export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
   const { callee } = path.node;
+
+  const { blackListCallExpressionCalle } = getAstConfig();
 
   if (callee.type === 'Identifier') {
     const { callee } = path.node;
@@ -48,6 +34,10 @@ export const hasStringLiteralArguments = (path: NodePath<CallExpression>) => {
     if (blackListCallExpressionCalle.indexOf(callee.name) > -1) {
       return false;
     }
+  }
+
+  if (callee.type === 'Import') {
+    return false;
   }
 
   if (callee.type === 'MemberExpression') {
