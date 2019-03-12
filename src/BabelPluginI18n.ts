@@ -10,9 +10,9 @@ let keyMaxLength = 40;
 let phrases: string[] = [];
 let i18nMap = {};
 
-const addPhrase = (str: string) => {
-  const key = getStableKey(str, keyMaxLength);
-  const value = getStableValue(str);
+const addPhrase = (displayText: string, keyText?: string) => {
+  const key = getStableKey(keyText ? keyText: displayText, keyMaxLength);
+  const value = getStableValue(displayText);
 
   if (!key || !value) {
     return null;
@@ -31,24 +31,34 @@ function BabelPluginI18n(): PluginObj {
   return {
     name: 'i18n',
     visitor: {
-      JSXText(path) {
-        const { node } = path;
-
-        if (node.value && node.value.trim()) {
-          const values = addPhrase(node.value);
-
-          if (!values) {
-            return;
-          }
-
-          path.node.value = `t('${values.key}')`
-        }
-      },
       JSXAttribute(path) {
         const { node } = path;
 
         if (hasStringLiteralJSXAttribute(path) && !isSvgElementAttribute(path)) {
           addPhrase(node.value.value);
+        }
+      },
+      JSXElement(path) {
+        const { node } = path;
+        const jsxContentNodes =  node.children;
+        let textWithArgs = '';
+        let textWithoutArgs = '';
+        let argIndex = 0;
+        let hasText = false;
+        for(let i = 0; i < jsxContentNodes.length; i++) {
+          const element = jsxContentNodes[i];
+          if (element.type === 'JSXText') {
+            hasText = true;
+            textWithArgs += element.value;
+            textWithoutArgs += element.value;
+          }
+          if (element.type === 'JSXExpressionContainer') {
+            textWithArgs += `{arg${argIndex}}`;
+            argIndex++;
+          }
+        }
+        if (hasText) {
+          addPhrase(textWithArgs, textWithoutArgs);
         }
       },
       JSXExpressionContainer(path) {

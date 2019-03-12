@@ -222,6 +222,53 @@ function translateFunctionArguments(j: JSCodeshift, root: Collection<any>) {
 //<span>test</span>
 function translateJsxContent(j: JSCodeshift, root: Collection<any>) {
   let hasI18nUsage = false;
+  root.find(j.JSXElement)
+    .forEach((n: NodePath<JSXElement>) => {
+      const jsxContentNodes =  n.value.children;
+      let text = '';
+      let translateArgs = [];
+      let newChildren = [];
+      for(let i = 0; i < jsxContentNodes.length; i++) {
+        const element = jsxContentNodes[i];
+        if (j.JSXText.check(element)) {
+          if (element.value.trim().length > 0) {
+          text += element.value;
+          } else {
+            newChildren.push(element);
+          }
+          continue;
+        } else if (j.JSXExpressionContainer.check(element)) {
+          translateArgs.push(element.expression);
+          continue;
+        }
+        if (text.trim().length > 0) {
+          hasI18nUsage = true;
+          newChildren.push(buildTranslationWithArgumentsCall(
+            j, translateArgs, text.trim()
+          ));
+        }
+        text = '';
+        translateArgs = [];
+        newChildren.push(element);
+        }
+
+      if (text.trim().length > 0) {
+        hasI18nUsage = true;
+        newChildren.push(buildTranslationWithArgumentsCall(
+          j, translateArgs, text.trim()
+        ));
+      }
+      if (newChildren.length > 0) {
+        //n.value.children = newChildren;
+        n.replace(
+          j.jsxElement(
+            n.node.openingElement, n.node.closingElement,
+            newChildren
+          )
+        )
+      }
+    });
+
   root
     .find(j.JSXText)
     .filter((path: NodePath<JSXText>) => path.node.value && path.node.value.trim())
@@ -288,6 +335,23 @@ function translateJsxProps(j: JSCodeshift, root: Collection<any>) {
     }));
 
   return hasI18nUsage;
+}
+
+function buildTranslationWithArgumentsCall(j: JSCodeshift, translateArgs: any, text: string) {
+    const translationCallArguments = [
+      j.literal(getStableKey(text)),
+    ] as any;
+    if (translateArgs.length > 0) {
+      translationCallArguments.push(
+        j.objectExpression(
+          translateArgs.map((expression: any, index: any) =>
+            j.property('init', j.identifier('arg' + index), expression )
+          )
+        )
+      )
+    }
+    return j.jsxExpressionContainer(
+        j.callExpression(j.identifier('t'), translationCallArguments));
 }
 
 function withTranslationHoc(j: JSCodeshift, identifier: any) {

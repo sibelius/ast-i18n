@@ -10,7 +10,7 @@ const Custom = (props: CustomProps) => {
     <div>
       <span>{props.title}</span>
     </div>
-  )
+  );
 }
 
 const Simple = () => {
