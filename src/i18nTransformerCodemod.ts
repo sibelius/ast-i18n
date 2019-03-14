@@ -3,6 +3,7 @@ import { getStableKey } from './stableString';
 import { hasStringLiteralArguments, hasStringLiteralJSXAttribute, isSvgElement } from "./visitorChecks";
 import { CallExpression, ImportDeclaration, JSXAttribute, JSXText } from "@babel/types";
 import {
+  ConditionalExpression,
   JSXElement,
   JSXExpressionContainer
 } from "ast-types/gen/nodes";
@@ -256,7 +257,7 @@ function translateJsxProps(j: JSCodeshift, root: Collection<any>) {
   root
     .find(j.JSXExpressionContainer)
     .filter((path: NodePath<JSXExpressionContainer>) => {
-      return path.node.expression && path.node.expression.type === 'StringLiteral'
+      return path.node.expression && j.StringLiteral.check(path.node.expression)
     })
     .forEach(path => {
       const key = getStableKey(path.node.expression.value);
@@ -264,6 +265,27 @@ function translateJsxProps(j: JSCodeshift, root: Collection<any>) {
 
       path.node.expression = tCallExpression(j, key);
     });
+
+  //<Comp name={bool ? 'aaa' : 'bbb'} />
+  root
+    .find(j.JSXExpressionContainer)
+    .filter((path: NodePath<JSXExpressionContainer>) => {
+      return path.node.expression && j.ConditionalExpression.check(path.node.expression)
+    })
+    .forEach(((path: NodePath<ConditionalExpression>) => {
+      let expression = path.value.expression;
+      if (j.Literal.check(expression.consequent)) {
+        hasI18nUsage = true;
+        const key = getStableKey(expression.consequent.value);
+        expression.consequent = tCallExpression(j, key);
+      }
+      if (j.Literal.check(expression.alternate)) {
+        hasI18nUsage = true;
+        const key = getStableKey(expression.alternate.value);
+        expression.alternate = tCallExpression(j, key);
+      }
+      hasI18nUsage = true;
+    }));
 
   return hasI18nUsage;
 }
