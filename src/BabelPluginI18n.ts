@@ -56,6 +56,14 @@ function BabelPluginI18n(): PluginObj {
 
         if (node.expression.type === 'StringLiteral') {
           addPhrase(path.node.expression.value);
+        } else if (node.expression.type === 'ConditionalExpression') {
+          let expression = path.node.expression;
+          if (expression.consequent.type === 'StringLiteral') {
+            addPhrase(expression.consequent.value)
+          }
+          if (expression.alternate.type === 'StringLiteral') {
+            addPhrase(expression.alternate.value);
+          }
         }
       },
       CallExpression(path) {
