@@ -1,4 +1,4 @@
-# AST i18n
+# AST i18n [![Build Status](https://travis-ci.org/sibelius/ast-i18n.svg?branch=master)](https://travis-ci.org/sibelius/ast-i18n)
 
 The objective of this tool is to make easy to migrate an existing codebase to use i18n
 
