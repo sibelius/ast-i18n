@@ -5,14 +5,17 @@ import {
   hasStringLiteralJSXAttribute,
   isSvgElementAttribute
 } from "./visitorChecks";
+import { NodePath } from "ast-types";
+import { JSXElement } from "ast-types/gen/nodes";
+import jsx from "ast-types/def/jsx";
 
 let keyMaxLength = 40;
 let phrases: string[] = [];
 let i18nMap = {};
 
-const addPhrase = (str: string) => {
-  const key = getStableKey(str, keyMaxLength);
-  const value = getStableValue(str);
+const addPhrase = (displayText: string, keyText?: string) => {
+  const key = getStableKey(keyText ? keyText: displayText, keyMaxLength);
+  const value = getStableValue(displayText);
 
   if (!key || !value) {
     return null;
@@ -31,25 +34,20 @@ function BabelPluginI18n(): PluginObj {
   return {
     name: 'i18n',
     visitor: {
-      JSXText(path) {
-        const { node } = path;
-
-        if (node.value && node.value.trim()) {
-          const values = addPhrase(node.value);
-
-          if (!values) {
-            return;
-          }
-
-          path.node.value = `t('${values.key}')`
-        }
-      },
       JSXAttribute(path) {
         const { node } = path;
 
         if (hasStringLiteralJSXAttribute(path) && !isSvgElementAttribute(path)) {
           addPhrase(node.value.value);
         }
+      },
+      JSXElement(path) {
+        const { node } = path;
+        const jsxContentNodes =  node.children;
+        extractArguments(jsxContentNodes)
+          .forEach(({textWithArgs, textWithoutArgs}) =>
+            addPhrase(textWithArgs, textWithoutArgs));
+
       },
       JSXExpressionContainer(path) {
         const { node } = path;
@@ -89,6 +87,35 @@ function BabelPluginI18n(): PluginObj {
       }
     }
   }
+}
+
+function extractArguments(jsxContentNodes: NodePath<any>[]) {
+  let textWithArgs = '';
+  let textWithoutArgs = '';
+  let argIndex = 0;
+  let hasText = false;
+  const texts = [];
+  for(let i = 0; i < jsxContentNodes.length; i++) {
+    const element = jsxContentNodes[i];
+    if (element.type === 'JSXText') {
+      hasText = true;
+      textWithArgs += element.value;
+      textWithoutArgs += element.value;
+    } else if (element.type === 'JSXExpressionContainer') {
+      textWithArgs += `{arg${argIndex}}`;
+      argIndex++;
+    } else {
+      if (hasText) {
+        texts.push({ textWithArgs, textWithoutArgs });
+        textWithArgs = '';
+        textWithoutArgs = ''
+      }
+    }
+  }
+  if (hasText) {
+    texts.push({ textWithArgs, textWithoutArgs });
+  }
+  return texts;
 }
 
 BabelPluginI18n.clear = () => {

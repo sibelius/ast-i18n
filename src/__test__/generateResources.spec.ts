@@ -38,4 +38,5 @@ describe('generateResources', () => {
   defineTest(__dirname, 'Yup');
   defineTest(__dirname, 'CallExpression');
   defineTest(__dirname, 'Svg');
+  defineTest(__dirname, 'Parameters');
 });
