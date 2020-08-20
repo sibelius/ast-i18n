@@ -23,5 +23,7 @@ module.exports = {
     '@babel/plugin-transform-async-to-generator',
     '@babel/plugin-proposal-async-generator-functions',
     '@babel/plugin-syntax-dynamic-import',
+    '@babel/plugin-proposal-optional-chaining',
+    '@babel/plugin-proposal-nullish-coalescing-operator'
   ],
 };
