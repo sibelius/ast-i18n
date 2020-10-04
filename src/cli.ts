@@ -2,14 +2,13 @@ import yargs from 'yargs';
 import shell from 'shelljs';
 
 import { generateResources } from './generateResources';
+import { filterFiles, DEFAULT_TEST_FILE_REGEX } from './filterFiles';
 
 type Argv = {
   src: string,
   keyMaxLength: number,
   ignoreFilesRegex: string;
 }
-
-const DEFAULT_TEST_FILE_REGEX = '(/__tests__/.*|(\\.|/)(test|spec))\\.(js|ts|tsx|jsx)?$';
 
 export const run = (argv: Argv) => {
   argv = yargs(argv || process.argv.slice(2))
@@ -33,8 +32,7 @@ export const run = (argv: Argv) => {
     )
     .argv;
   
-  const ignoreFilesRegex = new RegExp(argv.ignoreFilesRegex);
-  const jsFiles = shell.find(argv.src).filter(path => /\.(js|ts|tsx)$/.test(path) && !ignoreFilesRegex.test(path));
+  const jsFiles = filterFiles(shell.find)(argv.src, argv.ignoreFilesRegex);
 
   generateResources(jsFiles, argv.keyMaxLength);
 };
