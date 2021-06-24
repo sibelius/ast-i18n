@@ -1,6 +1,6 @@
 {
   "name": "ast-i18n",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Sibelius Seraphini <sibeliusseraphini@gmail.com> (https://github.com/sibelius)",
   "bin": {
     "ast-i18n": "./bin/cli"
