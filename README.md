@@ -80,7 +80,7 @@ i18n.use(LanguageDetector).init({
 ```bash
 npm i -g jscodeshift
 
-jscodeshift -t src/i18nTransfomerCodemod.ts PATH_TO_FILES
+jscodeshift -t src/i18nTransformerCodemod.ts PATH_TO_FILES
 ```
 
 ## How to customize blacklist
